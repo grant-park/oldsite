@@ -546,10 +546,11 @@ angular.module('Site', ['ngAnimate','times.tabletop','ngSanitize','luegg.directi
                 portfolioResp = Papa.parse(Papa.unparse(pObj.values));
                 var parsedObj = {};
                 parsedObj.dialogue = [];
-                _.each(dialogueResp.elements,function(el) {
+                dialogueResp.data.shift();
+                _.each(dialogueResp.data,function(el) {
                     parsedObj.dialogue.push({
-                        possibleInputs: el.possibleInputs.split(','),
-                        response: el.response
+                        possibleInputs: el[0].split(','),
+                        response: el[1]
                     });
                 });
                 parsedObj.portfolio = portfolioResp.data;
@@ -576,7 +577,6 @@ angular.module('Site', ['ngAnimate','times.tabletop','ngSanitize','luegg.directi
             if (currentIterPage !== []) {
                 $scope.pages.push(currentIterPage);
             }    
-            console.log(currentIterPage);
 
 
         registerMessage("Hi, I'm Grant Park. Ask me anything you'd like. For suggestions, try '?'");
