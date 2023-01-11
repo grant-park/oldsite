@@ -41,9 +41,8 @@ var tasks = {
       b.bundle().pipe(process.stdout);
     },
     scripts: function(){
-      return gulp.src(['dev/js/tabletop.js','dev/js/TabletopProvider.js','dev/js/data.js'])
+      return gulp.src(['dev/js/tabletop.js','dev/js/papaparse.js','dev/js/TabletopProvider.js','dev/js/data.js'])
         .pipe(concat('app.js'))
-        .pipe(minify({min:'.js'}))
         .pipe(gulp.dest('prod/js/'))
         .pipe(livereload());
     }
@@ -58,8 +57,8 @@ gulp.task('scripts',tasks.scripts);
 // Dev > Prod (+ linting)
 gulp.task('watch',function() {
   livereload.listen();
-  gulp.watch('dev/sass/**/*.scss',['styles']);
-  gulp.watch('dev/jade/**/*.jade',['templates']);
-  gulp.watch(['gulpfile.js','dev/js/**/*.js'],['lintjs','scripts']);
+  gulp.watch('dev/sass/**/*.scss',gulp.series('styles'));
+  gulp.watch('dev/jade/**/*.jade',gulp.series('templates'));
+  gulp.watch(['gulpfile.js','dev/js/**/*.js'],gulp.series('lintjs','scripts'));
 });
 })();

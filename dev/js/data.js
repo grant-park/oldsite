@@ -4,10 +4,10 @@ angular.module('Site', ['ngAnimate','times.tabletop','ngSanitize','luegg.directi
 
     .config(['TabletopProvider', function(TabletopProvider){
         // Tabletop setup
-        TabletopProvider.setTabletopOptions({
-            key: '1uvHeB66RrTJ87hmna5SnSvBeiuCQ3PE84OLcTL6iwdI',
-            simple_url: true
-        });
+        // TabletopProvider.setTabletopOptions({
+        //     key: '1uvHeB66RrTJ87hmna5SnSvBeiuCQ3PE84OLcTL6iwdI',
+        //     simple_url: true
+        // });
     }])        
 
     .factory('RandomName',[function(){
@@ -38,16 +38,16 @@ angular.module('Site', ['ngAnimate','times.tabletop','ngSanitize','luegg.directi
 
     .factory('DialoguePortfolioParser',[function(){
         var api = {
-            parse: function(data){
+            parse: function(dialogue, portfolio){
                 var parsedObj = {};
                 parsedObj.dialogue = [];
-                _.each(data[0].Dialogue.elements,function(el) {
+                _.each(dialogue.elements,function(el) {
                     parsedObj.dialogue.push({
                         possibleInputs: el.possibleInputs.split(','),
                         response: el.response
                     });
                 });
-                parsedObj.portfolio = data[0].Portfolio.elements;
+                parsedObj.portfolio = portfolio.elements;
                 return parsedObj;
             }
         };
@@ -240,7 +240,7 @@ angular.module('Site', ['ngAnimate','times.tabletop','ngSanitize','luegg.directi
                     registerMessage(input, 'user');
                     $element.find('input').val('');
                     $scope.currentUser.text = null;
-                    socket.emit('new message', input);
+                    //socket.emit('new message', input);
                     if ($scope.amSelected) {
                         // TODO: reconfigure things...
                     } else {
@@ -265,35 +265,319 @@ angular.module('Site', ['ngAnimate','times.tabletop','ngSanitize','luegg.directi
             }
         };
 
-        // Waking Google spreadsheets up...
-        Tabletop.then(function(data){
-            var deferred = $q.defer();
-            if (data) {
-                deferred.resolve(data);
-            } else {
-                deferred.reject("Could not retrieve data");
-            }
-            return deferred.promise;
-        }).then(function(data){
-            parsedData = DialoguePortfolioParser.parse(data);
-            dialogue = parsedData.dialogue;
+        let portfolioResp = null;
+        let dialogueResp = null;
+
+
+                var dObj = {
+  range: "Dialogue!A1:Z999",
+  majorDimension: "ROWS",
+  values: [
+    [
+      "possibleInputs",
+      "response"
+    ],
+    [
+      "i love you",
+      "I-I'm flattered! &#128563;"
+    ],
+    [
+      "i miss you",
+      "You can always talk to me here! &#128522;"
+    ],
+    [
+      "hello,greetings,hi,hey,wassup,whats up,ayy,hola,ni hao,hoy,eyy",
+      "Hello &#128522;"
+    ],
+    [
+      "where are you from,you from,born",
+      "I was born in Chattanooga, TN and raised in Huntsville, AL."
+    ],
+    [
+      "okay,oh",
+      "Yup"
+    ],
+    [
+      "you're,youre,you are",
+      "Why, thank-you &#128522;'"
+    ],
+    [
+      "movie",
+      "My favorite movie is <i>The Imitation Game</i>."
+    ],
+    [
+      "book",
+      "My favorite novel is <i>The Brothers Karamazov</i> by Fyodor Dostoevsky."
+    ],
+    [
+      "person in history,historical person,favorite person",
+      "Nikola Tesla"
+    ],
+    [
+      "place",
+      "Boston"
+    ],
+    [
+      "food",
+      "Tonkatsu"
+    ],
+    [
+      "animal",
+      "Dog"
+    ],
+    [
+      "color,colour",
+      "Teal"
+    ],
+    [
+      "want to do,plan,future,would you like to do,what do you want",
+      "I&#39;d like to someday work full-time at either a start-up or a large company as a software engineer."
+    ],
+    [
+      "music,listen,genre,what do you like,what kind of stuff do you like",
+      "I like jazzy instrumental hip-hop and classical music."
+    ],
+    [
+      "instruments,play",
+      "I play the piano, violin, oboe, clarinet, and French horn."
+    ],
+    [
+      "study,major,subject,degree,bachelor,college,school",
+      "I&#39;m currently majoring in computer science and math at Amherst College."
+    ],
+    [
+      "age,old",
+      "E.AGE"
+    ],
+    [
+      "name",
+      "Grant Park"
+    ],
+    [
+      "where,live",
+      "I currently live in Amherst, MA."
+    ],
+    [
+      "not,bad,terrible",
+      "Sorry to hear that. &#128533;"
+    ],
+    [
+      "good,fine,well,awesome,fantastic,amazing,same,me too,as well",
+      "Sweet. &#128522;"
+    ],
+    [
+      "how are you,how are you doing,how are you feeling",
+      "I&#39;m doing pretty well, thanks! How about you?"
+    ],
+    [
+      "weather,cold,climate,temp,hot,warm,chill",
+      "E.WEATHER"
+    ],
+    [
+      "lol,rofl,wow,woah,dang,huh,eh,hm,jeez,geez,cool",
+      "&#128522;"
+    ],
+    [
+      "project,example,done",
+      "Tap this phone&#39;s home button or enter <span style='color:lemonchiffon'>&#39;switch&#39;</span> to transition to my projects."
+    ],
+    [
+      "contact,email,reach",
+      "You can email me at <a href='mailto:gpark18@amherst.edu'>gpark18@amherst.edu</a>."
+    ],
+    [
+      "about,you do,job,occupation,now,language,work,who are you,who",
+      "I&#39;m a junior at Amherst College and I freelance mobile applications. In addition to Node.js, I work with Cordova/Ionic, Python, Swift/Obj-C, and Java."
+    ],
+    [
+      "do you like to do,hob,design,extracurricular,outside,fun",
+      "I&#39;m an <a href='https://soundcloud.com/grant-park' target='_blank'>indie artist</a>, rowing athlete, and <a href='https://www.behance.net/grantpark' target='_blank'>designer</a>. Check out my <a href='https://medium.com/@grantxs' target='_blank'>blog</a> &#128513;"
+    ],
+    [
+      "linkedin",
+      "Here is my <a href='https://www.linkedin.com/in/granthpark' target='_blank'>LinkedIn</a>."
+    ],
+    [
+      "git",
+      "Here is my <a href='https://github.com/sungjp' target='_blank'>Github</a>."
+    ],
+    [
+      "resume",
+      "Here is my <a href='parkgrantresume.pdf' target='_blank'>resume</a>."
+    ],
+    [
+      "links",
+      "Here is my <a href='parkgrantresume.pdf' target='_blank'>resume</a>, <a href='https://github.com/sungjp' target='_blank'>Github</a>, and <a href='https://www.linkedin.com/in/granthpark' target='_blank'>LinkedIn</a>."
+    ],
+    [
+      "?,help",
+      "Try including: <span style='color:navajowhite;'> <br/> &#39;links&#39; <br/> &#39;projects&#39; <br/> &#39;hobbies&#39; <br/> &#39;contact&#39; <br/> &#39;about&#39; </span> "
+    ],
+    [
+      "switch",
+      "Switched!"
+    ],
+    [
+      "automaton,machine,learning,nlp,engine",
+      "You've caught on. There is no NLP to be seen here :P"
+    ],
+    [
+      "secret",
+      "https://docs.google.com/spreadsheets/d/1uvHeB66RrTJ87hmna5SnSvBeiuCQ3PE84OLcTL6iwdI/edit?usp=sharing"
+    ]
+  ]
+}
+                dialogueResp =Papa.parse(Papa.unparse(dObj.values)); 
+
+                                var pObj = {
+  range: "Portfolio!A1:Z998",
+  majorDimension: "ROWS",
+  values: [
+    [
+      "name",
+      "icon",
+      "link",
+      "description"
+    ],
+    [
+      "Hurdlr",
+      "hurdlr",
+      "https://hurdlr.com/",
+      "Interned Summer 2016"
+    ],
+    [
+      "Dangle",
+      "dangle",
+      "https://itunes.apple.com/us/app/dangle-parents-kids-connect/id1082572052?mt=8",
+      "iOS Engineer 2015"
+    ],
+    [
+      "Setmine",
+      "setmine",
+      "https://www.setmine.com/",
+      "Interned Summer 2014"
+    ],
+    [
+      "Hungrie",
+      "hungrie",
+      "http://www.hungrie.site/",
+      "Summer Project 2015"
+    ],
+    [
+      "Byte",
+      "byte",
+      "http://yhackbyte.herokuapp.com/",
+      "YHack 2015"
+    ],
+    [
+      "NoteSMS",
+      "notesms",
+      "http://www.grant.ai/prod/BostonHacks/index.html",
+      "Boston Hacks 2015"
+    ],
+    [
+      "Eve",
+      "eye",
+      "http://htntravelbot.azurewebsites.net/",
+      "Hack the North 2016"
+    ],
+    [
+      "Amherst EC",
+      "amherstec",
+      "http://amherstec.github.io/",
+      "Hardware Hacks"
+    ],
+    [
+      "CodePen",
+      "codepen",
+      "http://codepen.io/sungjp/",
+      "Frontend Hacks"
+    ],
+    [
+      "52",
+      "calendar",
+      "http://grant.ai/52",
+      "Life Calendar"
+    ],
+    [
+      "Music",
+      "soundcloud",
+      "https://soundcloud.com/grant-park",
+      "Indie Music"
+    ],
+    [
+      "Blog",
+      "medium",
+      "https://medium.com/@grantxs",
+      "Medium"
+    ],
+    [
+      "Design",
+      "behance",
+      "https://www.behance.net/grantpark",
+      "Behance"
+    ],
+    [
+      "UI/UX",
+      "dribbble",
+      "https://dribbble.com/grantpark",
+      "Dribbble"
+    ],
+    [
+      "Code Stream",
+      "pair",
+      "http://www.watchpeoplecode.com/streamer/grantxs",
+      "Watch Sat/Sun 3-5pm"
+    ],
+    [
+      "Keyboard",
+      "keyboard",
+      "https://imgur.com/a/mwTFj",
+      "What I type on"
+    ],
+    [
+      "Data Source",
+      "secret",
+      "https://docs.google.com/spreadsheets/d/1uvHeB66RrTJ87hmna5SnSvBeiuCQ3PE84OLcTL6iwdI/edit?usp=sharing",
+      "This site's dynamic data"
+    ]
+  ]
+}
+                portfolioResp = Papa.parse(Papa.unparse(pObj.values));
+                var parsedObj = {};
+                parsedObj.dialogue = [];
+                _.each(dialogueResp.elements,function(el) {
+                    parsedObj.dialogue.push({
+                        possibleInputs: el.possibleInputs.split(','),
+                        response: el.response
+                    });
+                });
+                parsedObj.portfolio = portfolioResp.data;
+                parsedData = parsedObj
+                dialogue = parsedData.dialogue;
             $scope.portfolio = parsedData.portfolio;
             // currently set page capacity to 20 apps
             $scope.pages = [];
 
             var currentIterPage = [];
+            $scope.portfolio.shift();
             _.each($scope.portfolio, function(el){
                 if (currentIterPage.length === capacity) {
                     $scope.pages.push(currentIterPage); 
                     currentIterPage = [];
                 }
-                currentIterPage.push(el);
+                currentIterPage.push({
+                    name: el[0],
+                    icon: el[1],
+                    link: el[2],
+                    description: el[3]
+                });
             });
             if (currentIterPage !== []) {
                 $scope.pages.push(currentIterPage);
-            }
+            }    
+            console.log(currentIterPage);
 
-        },function(msg){console.error(msg);});
 
         registerMessage("Hi, I'm Grant Park. Ask me anything you'd like. For suggestions, try '?'");
 
@@ -336,47 +620,48 @@ angular.module('Site', ['ngAnimate','times.tabletop','ngSanitize','luegg.directi
             secret: 'prod/img/spreadsheets.png'
         };
 
+
         // Socket.io
         // 1) if app starts with me online
         // then start init message indicatinng im online
         // 2) if I come online while app already started
         //  then quietly send message (which pings if user is not in chat mode)
-        var socket = io.connect('https://grantbot.herokuapp.com/');
-        GetLocation.then(function(resp){
-            socket.emit('new user', RandomName + ' (' + resp + ')');
-        });
-        window.socket = socket;
+        // var socket = io.connect('https://grantbot.herokuapp.com/');
+        // GetLocation.then(function(resp){
+        //     socket.emit('new user', RandomName + ' (' + resp + ')');
+        // });
+        // window.socket = socket;
 
-        $scope.amSelected = false;
+        // $scope.amSelected = false;
 
-        socket.on('I choose you!', function(){
-            $scope.amSelected = true; 
-            registerMessage("Grant has connected.", undefined, { ping: true, offline: false });
-            $scope.updateNotif = true;
-            $scope.notifCount += 1;
-            $timeout(function(){
-                $scope.updateNotif = false; 
-            },1000);
-        });
+        // socket.on('I choose you!', function(){
+        //     $scope.amSelected = true; 
+        //     registerMessage("Grant has connected.", undefined, { ping: true, offline: false });
+        //     $scope.updateNotif = true;
+        //     $scope.notifCount += 1;
+        //     $timeout(function(){
+        //         $scope.updateNotif = false; 
+        //     },1000);
+        // });
 
-        socket.on('master message', function(data) {
-            registerMessage(data);        
-            $scope.notifCount += 1;
-            $scope.updateNotif = true;
-            $timeout(function(){
-                $scope.updateNotif = false;
-            },1000);
-        });
+        // socket.on('master message', function(data) {
+        //     registerMessage(data);        
+        //     $scope.notifCount += 1;
+        //     $scope.updateNotif = true;
+        //     $timeout(function(){
+        //         $scope.updateNotif = false;
+        //     },1000);
+        // });
 
-        socket.on('bye', function(){
-            $scope.amSelected = false; 
-            // should ping here grant has disconnected
-            registerMessage("Grant has disconnected.", undefined, { ping: true, offline: true });
-        });
+        // socket.on('bye', function(){
+        //     $scope.amSelected = false; 
+        //     // should ping here grant has disconnected
+        //     registerMessage("Grant has disconnected.", undefined, { ping: true, offline: true });
+        // });
 
-        socket.on('masterOnline', function(){
-            $scope.masterOnline = true; 
-            // could ping here that grant connected
-        });
+        // socket.on('masterOnline', function(){
+        //     $scope.masterOnline = true; 
+        //     // could ping here that grant connected
+        // });
     }]);
 })(); 

@@ -25,18 +25,21 @@
     "angularjs-scroll-glue": "^2.0.7",
     "browserify": "^13.0.1",
     "css": "^2.2.1",
-    "gulp": "^3.9.1",
     "gulp-clean-css": "^2.0.10",
     "gulp-concat": "^2.6.0",
     "gulp-jade": "^1.1.0",
     "gulp-jshint": "^2.0.1",
     "gulp-livereload": "^3.8.1",
     "gulp-minify": "0.0.12",
-    "gulp-sass": "^2.3.2",
     "jshint": "^2.9.2",
     "jshint-stylish": "^2.2.0"
   },
   "dependencies": {
-    "lodash": "^4.13.1"
+    "graceful-fs": "^4.2.10",
+    "gulp": "^4.0.2",
+    "gulp-sass": "^5.1.0",
+    "gulp-update": "0.0.2",
+    "lodash": "^4.13.1",
+    "natives": "^1.1.6"
   }
 }
